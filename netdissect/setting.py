@@ -132,12 +132,12 @@ def load_dataset(domain, split=None, full=False, download=True):
     if domain == 'places':
         if split is None:
             split = 'val'
-        dirname = 'datasets/places/%s' % split
+        dirname = 'datasets/microimagenet'
         if download and not os.path.exists(dirname):
             os.makedirs('datasets', exist_ok=True)
             torchvision.datasets.utils.download_and_extract_archive(
                 'http://gandissect.csail.mit.edu/datasets/' +
-                'places_%s.zip' % split,
+                'microimagenet.zip',
                 'datasets',
                 md5=dict(val='593bbc21590cf7c396faac2e600cd30c',
                          train='')[split])
