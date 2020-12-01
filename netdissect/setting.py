@@ -172,7 +172,7 @@ g_places_transform = torchvision.transforms.Compose([
     torchvision.transforms.Resize(256),
     torchvision.transforms.CenterCrop(224),
     torchvision.transforms.ToTensor(),
-    renormalize.NORMALIZER['places_meanonly']])
+    renormalize.NORMALIZER['imagenet']])
 
 def load_segmenter(segmenter_name='netpqc'):
     '''Loads the segementer.'''
