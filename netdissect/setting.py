@@ -138,9 +138,7 @@ def load_dataset(domain, split=None, full=False, download=True):
             torchvision.datasets.utils.download_and_extract_archive(
                 'http://gandissect.csail.mit.edu/datasets/' +
                 'microimagenet.zip',
-                'datasets',
-                md5=dict(val='593bbc21590cf7c396faac2e600cd30c',
-                         train='')[split])
+                'datasets')
         return parallelfolder.ParallelImageFolders([dirname],
                 classification=True,
                 shuffle=True,
