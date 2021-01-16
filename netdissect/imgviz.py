@@ -92,6 +92,13 @@ class ImageVisualizer:
             num = self.size[0] // 17
         return segviz.segment_key(segmentations, segmodel, num)
 
+    def segment_key_with_lbls(self, segmentations, seglbs):
+        '''
+        Obtains a list of the top segment labels present in the given
+        segmetation tensor, for use in a legend.
+        '''
+        return segviz.segment_key_with_lbls(segmentations, seglbs)
+
     def image(self, imagedata):
         '''
         Converts the given tensor imagedata to a PIL image, scaling

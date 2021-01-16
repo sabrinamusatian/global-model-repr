@@ -18,6 +18,15 @@ def segment_key(seg, segmodel, max_labels=6):
         result.append((swatch_image(ind), seglabels[ind][0]))
     return result
 
+def segment_key_with_lbls(seg, seglabels, max_labels=6):
+    bc = torch.bincount(seg.view(-1)).cpu()
+    result = []
+    for ind in bc.sort()[1].flip(0):
+        if len(result) >= max_labels or bc[ind].item() == 0:
+            break
+        result.append((swatch_image(ind), seglabels[ind]))
+    return result
+
 def segment_visualization(seg, size=None):
     # Handle both 2d tensor (single label segmentation) and 3d tensor
     # (multilabel segmentation)

@@ -243,7 +243,7 @@ def tally_mean(compute, dataset, sample_size=None, batch_size=10,
         return rv
 
 def tally_conditional_mean(compute, dataset,
-        sample_size=None, batch_size=1, cachefile=None, **kwargs):
+        sample_size=None, batch_size=1, cachefile=None, loader = None, pass_with_lbl = False, **kwargs):
     '''
     Computes conditional mean and variance for a large data sample that
     can be computed from a dataset.  The compute function should return a
@@ -255,16 +255,17 @@ def tally_conditional_mean(compute, dataset,
         cached_state = load_cached_state(cachefile, args)
         if cached_state is not None:
             return runningstats.RunningConditionalVariance(state=cached_state)
-        loader = make_loader(dataset, sample_size, batch_size, **kwargs)
+        if not loader:
+            loader = make_loader(dataset, sample_size, batch_size, **kwargs)
         cv = runningstats.RunningConditionalVariance()
         for i, batch in enumerate(pbar(loader)):
-            sample_set = call_compute(compute, batch)
+            sample_set = call_compute(compute, batch, pass_with_lbl)
             for cond, sample in sample_set:
                 # Move uncommon conditional data to the cpu before collating.
                 cv.add(cond, sample)
         # At the end, move all to the CPU
-        cv.to_('cpu')
-        save_cached_state(cachefile, cv, args)
+        # cv.to_('cpu')
+        # save_cached_state(cachefile, cv, args)
         return cv
 
 def tally_bincount(compute, dataset, sample_size=None, batch_size=10,
@@ -449,7 +450,7 @@ def iou_from_conditional_indicator_mean(condmv):
     for k in condmv.keys():
         gt[k] = condmv.conditional(k).size() / condmv.conditional(0).size()
         isect[k] = condmv.conditional(k).mean() * gt[k]
-    union = act[None,:] + gt[:,None] - isect
+    union = act[None,:].cpu() + gt[:,None].cpu() - isect.cpu()
     iou = isect / union
     return iou
 
@@ -552,9 +553,11 @@ def information_quality_ratio(arr):
     iqr[torch.isnan(iqr)] = 0
     return iqr
 
-def call_compute(compute, batch):
+def call_compute(compute, batch, pass_with_lbl = False):
     '''Utility for passing a dataloader batch to a compute function.'''
     if isinstance(batch, list):
+        if pass_with_lbl:
+            return compute(batch)
         return compute(*batch)
     elif isinstance(batch, dict):
         return compute(**batch)
