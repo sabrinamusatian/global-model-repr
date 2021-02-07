@@ -270,8 +270,10 @@ class ImageVisualizer:
             acts_batch = compute(*data_batch)
             if isinstance(acts_batch, tuple):
                 acts_batch, image_batch = acts_batch
+                print("acts")
             else:
                 image_batch = data_batch[0]
+                print("image_batch")
             for gather_for, acts, imgt in (
                     zip(gather_indices, acts_batch, image_batch)):
                 for unit, rank in gather_for:
